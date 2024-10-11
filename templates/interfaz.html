@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema_Consulta_Estado_De_Salud_Para_Bebes</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Archivo de estilos CSS -->
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Menú de navegación -->
+    <nav>
+        <ul>
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#nosotros">Nosotros</a></li>
+            <li><a href="#sistema-experto">Sistema Experto</a></li>
+        </ul>
+    </nav>
+
+    <!-- Sección de Inicio con Carrusel -->
+    <header class="slider-main">
+        <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-ride="carousel">
+            <ol class="carousel-indicators">
+                <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+            </ol>
+            <div class="carousel-inner" role="listbox">
+                <!-- Slide One -->
+                <div class="carousel-item active" style="background-image: url('https://imagenes.20minutos.es/files/image_1920_1080/uploads/imagenes/2024/02/06/bebe-ia.jpeg')">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>LITTLE ONES</h3>
+                        <p>Brindandote ayuda y consejos para el cuidado de lo que mas amas</p>
+                    </div>
+                </div>
+                <!-- Slide Two -->
+                <div class="carousel-item" style="background-image: url('https://img.freepik.com/fotos-premium/bebe-encantador-feliz-sonando-estrellas-luna-ia-generativa_920025-2787.jpg')">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>CONSULTAS</h3>
+                        <p>Alimentacion Salud Desarrollo</p>
+                    </div>
+                </div>
+                <!-- Slide Three -->
+                <div class="carousel-item" style="background-image: url('https://img.freepik.com/fotos-premium/bebe-alegre-disfrutando-alimentacion-saludable-sonriendo-mirando-camara_1022921-2.jpg')">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>CONSEJOS</h3>
+                        <p>Te acompañamos en esta hermosa etapa de tu vida</p>
+                    </div>
+                </div>
+            </div>
+            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Anterior</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Siguiente</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Sección de Nosotros -->
+    <section id="nosotros" class="section-container">
+        <h2>QUIENES SOMOS</h2>
+        <p>Brindamos orientacion y apoyo durante los primeros 2 años del bebé, ayudandote a sentir confianza especialmente si eres padre primerizo. Te brindamos consejos sobre la alimentacion del bebé, informacion basica sobre el cuidado del bebé y somos un apoyo emocional para que disfrutes del proceso de criar a tus hijos.</p>
+        <img src="{{ url_for('static', filename='imagenes/imagen_estrella.avif') }}" alt="Imagen Nosotros" class="large-image imagen-tamano-fijo">
+    </section>
+
+    <!-- Sección Sistema Experto -->
+    <section id="sistema-experto" class="section-container">
+        <h2>CONSULTAS</h2>
+        <img src="{{ url_for('static', filename='imagenes/Arlethia.jpeg') }}" alt="Imagen Nosotros" class="large-image imagen-tamano-mediano">
+
+
+        <!-- Interfaz de sistema experto -->
+        <div class="container">
+            <section id="insertar-hechos">
+                <h3>Añadir hechos</h3>
+                <input type="text" id="hechos" placeholder="hechos separados por comas">
+                <input type="text" id="conclusion" placeholder="Conclusión">
+                <button onclick="insertarHechos()">Añadir hechos</button>
+            </section>
+
+            <section id="consultar-hechos">
+                <h3>Consultar hechos</h3>
+                <button onclick="consultar_hechos()">Mostrar hechos</button>
+                <ul id="lista-hechos"></ul>
+            </section>
+
+            <section id="Concluir">
+                <h3>Consultar estado de salud del bebe</h3>
+                <input type="text" id="hechos-input" placeholder="Ingrese hechos separados por comas">
+                <button onclick="consultarEstadoDeBebe()">Concluir</button>
+                <ul id="resultado_consulta"></ul>
+            </section>
+
+            <section id="eliminar-hechos">
+                <h3>Eliminar hechos</h3>
+                <input type="number" id="id-hechos" placeholder="ID de la hechos">
+                <button onclick="eliminarhechos()">Eliminar</button>
+            </section>
+        </div>
+    </section>
+
+    <script>
+        function insertarHechos() {
+            const hechos = document.getElementById('hechos').value.split(',');
+            const conclusion = document.getElementById('conclusion').value;
+
+            fetch('/insertar_hechos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hechos, conclusion })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message));
+        }
+
+        function consultar_hechos() {
+            fetch('/consultar_manual_para_padres')
+                .then(response => response.json())
+                .then(hechos => {
+                    const lista = document.getElementById('lista-hechos');
+                    lista.innerHTML = '';
+                    hechos.forEach(hecho => {
+                        const li = document.createElement('li');
+                        li.textContent = `ID: ${hecho.id}, hechos: ${hecho.hechos}, Conclusión: ${hecho.conclusion}`;
+                        lista.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Error al consultar los hechos:', error));
+}
+
+
+        function consultarEstadoDeBebe() {
+            const hechos = document.getElementById('hechos-input').value.split(',').map(hecho => hecho.trim());
+            console.log("Hechos enviados para la consulta:", hechos);  // Verifica los hechos ingresados
+
+            fetch('/consultar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hechos })
+            })
+            .then(response => {
+                console.log("Estado de respuesta:", response.status); // Verificar el estado de respuesta
+                return response.json();
+            })
+            .then(data => {
+                console.log("Respuesta recibida:", data);  // Verifica la respuesta de la consulta
+
+                const lista = document.getElementById('resultado_consulta');
+                lista.innerHTML = '';
+
+                if (data.conclusiones && data.conclusiones.length > 0) {
+                    data.conclusiones.forEach(conclusion => {
+                        const li = document.createElement('li');
+                        li.textContent = conclusion;
+                        lista.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.textContent = data.message;
+                    lista.appendChild(li);
+                }
+            })
+            .catch(error => console.error('Error al consultar:', error));
+        }
+
+
+        function eliminarhechos() {
+            const id = document.getElementById('id-hechos').value;
+
+            fetch('/eliminar_hechos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message));
+        }
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

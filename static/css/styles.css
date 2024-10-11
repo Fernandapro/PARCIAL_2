@@ -1,0 +1,120 @@
+/* Estilo general */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #88c9e7;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul {
+    background-color: #333;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 15px;
+}
+
+nav ul li a {
+    color: rgb(222, 245, 22);
+    text-decoration: none;
+    padding: 15px 20px;
+    display: block;
+}
+
+nav ul li a:hover {
+    background-color: #4CAF50;
+}
+
+.section-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #d99fdf;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+h1, h2, h3 {
+    color: #333;
+}
+
+.large-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* Estilo para la sección del sistema experto */
+.container {
+    background-color: #cc84df;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+input, button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #8798e5; /* Verde para verificar mejor visibilidad */
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #45a049; /* Un tono más oscuro para el hover */
+}
+
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: #a259f5;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.carousel-item {
+    height: 400px;
+    background-size: cover;
+    background-position: center;
+}
+
+.carousel-caption h3 {
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.carousel-caption p {
+    font-size: 1.2em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.imagen-tamano-fijo {
+    width: 500px;
+    height: 500px;
+}
+
+.imagen-tamano-mediano {
+    width: 400px;
+    height: 400px;
+}
