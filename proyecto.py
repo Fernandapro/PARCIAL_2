@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import pyodbc
+import pandas as pd
+from sklearn.linear_model import LinearRegression
 
 app = Flask(__name__)
 
@@ -19,11 +21,14 @@ def conectar_db():
         return None
 
 
-
-
 @app.route('/')
 def index():
     return render_template('interfaz.html')
+
+
+
+
+
 
 
 class hechos:
@@ -74,7 +79,7 @@ def consultar_manual_para_padres_interno():
         for row in cursor.fetchall():
             bebes.append({
                 "id": row[0],
-                "hechos": row[1].split(','),  #   hechos se manejen como una lista
+                "hechos": row[1].split(','),  
                 "conclusion": row[2]
             })
         conexion.close()
@@ -93,11 +98,11 @@ def consultar():
 
         hechos = set(data['hechos'])
         print("Hechos procesados:", hechos)  # Muestra los hechos procesados
-        bebes = consultar_manual_para_padres_interno()  # Usa la versión que devuelve una lista
+        bebes = consultar_manual_para_padres_interno()  
         print("Hechos disponibles en la base de datos:", bebes)  # Muestra los hechos disponibles
 
         conclusiones = encadenamiento_hacia_adelante(hechos, bebes)
-        print("Conclusiones generadas:", conclusiones)  # Muestra las conclusiones generadas
+        print("Conclusiones generadas:", conclusiones) 
 
         if conclusiones:
             return jsonify({"conclusiones": list(conclusiones)}), 200
@@ -108,6 +113,13 @@ def consultar():
         print("Error al procesar la solicitud:", e)
         return jsonify({"error": "Error interno del servidor."}), 500
     
+
+
+
+
+
+
+#anterior
    
 
 def encadenamiento_hacia_adelante(hechos, bebes):
@@ -202,27 +214,108 @@ def main():
         else:
             print("Opción inválida.Please try again.")
 
+
+
+
+# Datos de entrenamiento
+data = {
+    'peso': [14, 16, 18, 20, 22, 24, 26, 11],
+    'talla': [64, 66, 68, 70, 72, 74, 76, 58],
+    'duracion_fiebre': [1, 1.5, 2, 2.5, 3, 3.5, 4, 1],
+    'dosis': [8, 9, 10, 11, 12, 13, 14, 6]
+}
+df = pd.DataFrame(data)
+X = df[['peso', 'talla', 'duracion_fiebre']]
+y = df['dosis']
+
+# Inicializar y entrenar el modelo
+model = LinearRegression()
+model.fit(X, y)
+
+
+
+
+
+@app.route('/recomendacion_diclo_k', methods=['POST'])
+def calcular_dosificacion():
+    try:
+        data = request.get_json()
+        nombre = data.get('nombre')
+        peso = float(data.get('peso', 0))
+        talla = float(data.get('talla', 0))
+        duracion_fiebre = float(data.get('duracion_fiebre', 0))
+
+        # Validar entradas
+        if not nombre or not (0 < peso < 200 and 30 < talla < 300 and 0 <= duracion_fiebre < 48):
+            return jsonify({"error": "Datos inválidos. Verifique los valores ingresados."}), 400
+
+        if duracion_fiebre < 2:
+            try:
+                dosis = model.predict([[peso, talla, duracion_fiebre]])[0]
+                dosis = max(0, dosis)
+                mensaje = f"Dosis recomendada: {dosis:.1f} gotas de Diclo-K cada 8 horas por 3 días."
+            except Exception as e:
+                print("Error al predecir la dosis:", e)
+                return jsonify({"error": "No se pudo calcular la dosis. Intente más tarde."}), 500
+        else:
+            dosis = None
+            mensaje = f"La fiebre ha persistido durante {duracion_fiebre} horas. Consulte a un médico para exámenes adicionales."
+
+        # Guardar en base de datos
+        try:
+            conexion = conectar_db()
+            with conexion.cursor() as cursor:
+                cursor.execute('''
+                    INSERT INTO Dosificaciones (nombre, peso, talla, duracion_fiebre)
+                    VALUES (?, ?, ?, ?)
+                ''', (nombre, peso, talla, duracion_fiebre))
+                conexion.commit()
+        finally:
+            if conexion:
+                conexion.close()
+
+        return jsonify({"message": mensaje, "dosis": dosis}), 200
+
+    except Exception as e:
+        print("Error en calcular_dosificacion:", e)
+        return jsonify({"error": "Error interno del servidor."}), 500
+
+
+@app.route('/historial_dosificaciones', methods=['GET'])
+def historial_dosificaciones():
+    try:
+        conexion = conectar_db()
+        with conexion.cursor() as cursor:
+            cursor.execute('SELECT id, nombre, peso, talla, duracion_fiebre FROM Dosificaciones')
+            resultados = cursor.fetchall()
+
+        historial = []
+        for row in resultados:
+            id_, nombre, peso, talla, duracion_fiebre = row
+            if duracion_fiebre < 2:
+                try:
+                    dosis = model.predict([[peso, talla, duracion_fiebre]])[0]
+                    dosis = max(0, dosis)
+                except Exception as e:
+                    print("Error al predecir la dosis en historial:", e)
+                    dosis = None
+            else:
+                dosis = None
+
+            historial.append({
+                "id": id_,
+                "nombre": nombre,
+                "peso": peso,
+                "talla": talla,
+                "duracion_fiebre": duracion_fiebre,
+                "dosis": dosis
+            })
+
+        return jsonify(historial), 200
+
+    except Exception as e:
+        print("Error en historial_dosificaciones:", e)
+        return jsonify({"error": "Error interno del servidor."}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

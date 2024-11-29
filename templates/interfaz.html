@@ -30,10 +30,11 @@
             </ol>
             <div class="carousel-inner" role="listbox">
                 <!-- Slide One -->
-                <div class="carousel-item active" style="background-image: url('https://imagenes.20minutos.es/files/image_1920_1080/uploads/imagenes/2024/02/06/bebe-ia.jpeg')">
-                    <div class="carousel-caption d-none d-md-block">
-                        <h3>LITTLE ONES</h3>
-                        <p>Brindandote ayuda y consejos para el cuidado de lo que mas amas</p>
+                <div class="carousel-item active" 
+     style="background-image: url('https://media.istockphoto.com/id/1277047297/es/foto/madre-y-beb%C3%A9-acostados-en-el-prado.jpg?s=612x612&w=0&k=20&c=Te5E9fXLNUvkS98kdalLB_zJv4Shv7k8kSi3UxW492w=')">
+    <div class="carousel-caption d-none d-md-block">
+        <h3>LITTLE ONES</h3>
+        <p>Brindandote ayuda y consejos para el cuidado de lo que más amas</p>
                     </div>
                 </div>
                 <!-- Slide Two -->
@@ -104,6 +105,87 @@
             </section>
         </div>
     </section>
+
+
+
+
+
+    <section id="calcular-dosis">
+        <div style="border: 2px solid #007bff; border-radius: 10px; padding: 20px; background-color: #92a8e4; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); text-align: center; margin-bottom: 20px;">
+            <!-- Imagen -->
+            <img src="https://images.ctfassets.net/9wxrpbyuq7yw/4lwyyvyjZJgkKSkgnDEOtf/a24b35f47c2275ed6c7f112f2791b8f6/A100.jpeg?fm=webp&q=70" 
+                 alt="Ilustración relacionada con fiebre en bebés" 
+                 class="img-fluid" 
+                 style="max-width: 100%; height: auto; border-radius: 10px; margin-bottom: 15px;">
+    
+            <!-- Título y descripción -->
+            <h3 style="color: #007bff; margin-bottom: 10px;">FIEBRE - Calcular Dosis de Diclo-K</h3>
+            <p style="font-size: 16px; color: #333; margin: 0;">Por favor ingresar los datos del bebé de 0 a 2 años de edad, que tenga una temperatura mayor o igual a 38 grados.</p>
+        </div>
+    
+        <!-- Formulario -->
+        <form id="diclo-k-form">
+            <div class="form-group">
+                <label for="nombre-bebe">Nombre del bebé:</label>
+                <input type="text" id="nombre-bebe" class="form-control" placeholder="Ejemplo: Juan" required>
+            </div>
+            <div class="form-group">
+                <label for="peso-bebe">Peso (en libras):</label>
+                <input type="number" id="peso-bebe" class="form-control" placeholder="Ejemplo: 14" required>
+            </div>
+            <div class="form-group">
+                <label for="talla-bebe">Talla (en cm):</label>
+                <input type="number" id="talla-bebe" class="form-control" placeholder="Ejemplo: 64" required>
+            </div>
+            <div class="form-group">
+                <label for="duracion-fiebre">Duración de la fiebre (en horas):</label>
+                <input type="number" id="duracion-fiebre" class="form-control" placeholder="Ejemplo: 2" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Obtener Dosis</button>
+        </form>
+        <div class="mt-4" id="resultado-dosis"></div>
+    </section>
+
+
+            
+    <section id="historial-medico">
+        <!-- Contenedor estilizado -->
+        <div style="border: 2px solid #28a745; border-radius: 10px; padding: 20px; background-color: #dabeec; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); text-align: center; margin-bottom: 20px;">
+            <!-- Imagen -->
+            <img src="https://www.queestudiar.org/wp-content/uploads/2017/10/pediatra.jpeg" 
+                 alt="Historial médico" 
+                 class="img-fluid" 
+                 style="max-width: 100%; height: auto; border-radius: 10px; margin-bottom: 15px;">
+    
+            <!-- Título -->
+            <h3 style="color: #28a745; margin-bottom: 10px;">Historial Médico</h3>
+            <p style="font-size: 16px; color: #333; margin: 0;">Revisa y gestiona el historial médico de los pacientes de manera sencilla y organizada.</p>
+        </div>
+    
+        <!-- Botón para cargar historial -->
+        <button id="cargar-historial" class="btn btn-secondary btn-block">Cargar Historial</button>
+    
+        <!-- Tabla del historial -->
+        <table id="tabla-historial" class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Peso</th>
+                    <th>Talla</th>
+                    <th>Duración Fiebre</th>
+                    <th>Dosis Recomendada</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Los datos del historial se llenarán dinámicamente aquí -->
+            </tbody>
+        </table>
+    </section>
+
+
+
+
 
     <script>
         function insertarHechos() {
@@ -181,7 +263,92 @@
             .then(response => response.json())
             .then(data => alert(data.message));
         }
+
+        document.getElementById('diclo-k-form').addEventListener('submit', function (event) {
+        event.preventDefault(); // Evitar recarga de la página
+
+        // Obtener valores del formulario
+        const nombre = document.getElementById('nombre-bebe').value.trim();
+        const peso = parseFloat(document.getElementById('peso-bebe').value);
+        const talla = parseFloat(document.getElementById('talla-bebe').value);
+        const duracionFiebre = parseFloat(document.getElementById('duracion-fiebre').value);
+
+        // Validar los datos ingresados
+        if (!nombre || isNaN(peso) || isNaN(talla) || isNaN(duracionFiebre)) {
+            document.getElementById('resultado-dosis').innerText = "Por favor, ingresa valores válidos.";
+            return;
+        }
+
+        // Enviar datos al backend
+        fetch('/recomendacion_diclo_k', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nombre: nombre,
+                peso: peso,
+                talla: talla,
+                duracion_fiebre: duracionFiebre
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Manejar la respuesta del backend
+            if (data.error) {
+                document.getElementById('resultado-dosis').innerHTML = `<strong>Error:</strong> ${data.error}`;
+            } else if (data.dosis === null) {
+                document.getElementById('resultado-dosis').innerHTML = `
+                    <p><strong>${data.message}</strong></p>
+                `;
+            } else {
+                document.getElementById('resultado-dosis').innerHTML = `
+                    <p><strong>Nombre:</strong> ${nombre}</p>
+                    <p><strong>${data.message}</strong></p>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error al obtener la dosis:', error);
+            document.getElementById('resultado-dosis').innerText = "Hubo un error al calcular la dosis. Intenta de nuevo.";
+        });
+    });
+
+    async function obtenerHistorial() {
+        try {
+            const response = await fetch('/historial_dosificaciones');
+            if (!response.ok) {
+                throw new Error("Error al obtener el historial");
+            }
+            const historial = await response.json();
+            mostrarHistorial(historial);
+        } catch (error) {
+            console.error("Error:", error);
+            alert("No se pudo cargar el historial.");
+        }
+    }
+
+    function mostrarHistorial(historial) {
+        const tablaBody = document.querySelector("#tabla-historial tbody");
+        tablaBody.innerHTML = "";
+
+        historial.forEach(item => {
+            const fila = document.createElement("tr");
+
+            fila.innerHTML = `
+                <td>${item.id}</td>
+                <td>${item.nombre}</td>
+                <td>${item.peso}</td>
+                <td>${item.talla}</td>
+                <td>${item.duracion_fiebre}</td>
+                <td>${item.dosis !== null ? `${item.dosis.toFixed(1)} gotas` : "N/A"}</td>
+            `;
+
+            tablaBody.appendChild(fila);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", obtenerHistorial);
     </script>
+
 
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
